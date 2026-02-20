@@ -29,7 +29,7 @@ const Header = () => {
             </button>
 
             {/* Side Bar */}
-            <div id="mobileMenu" className='hidden fixed top-16 bottom-0 right-0 left-0 p-5 md:hidden z-40 bg-black bg-opacity-70 backdrop-blur-md'>
+            <div id="mobileMenu" className='hidden fixed top-16 bottom-120 right-20 left-20 p-5 md:hidden z-40 bg-black bg-opacity-70 backdrop-blur-md'>
                 <nav className='flex flex-col gap-6 items-center'>
                     <a className='text-white text-base tracking-wider transition-colors hover:text-gray-300 z-50' href="#">GLOBE</a>
                     <a className='text-white text-base tracking-wider transition-colors hover:text-gray-300 z-50' href="#">DISASTERS</a>
