@@ -75,6 +75,15 @@ const Dashboard = () => {
                 </div>
             )}
 
+            {response && response.query_type === 'external' && (
+                <div className='max-w-7xl mx-auto space-y-6'>
+                    <div className='bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg border-l-4 border-purple-600'>
+                        <h2 className='text-2xl font-bold mb-4 text-purple-800'>🤖 General AI Response</h2>
+                        <div className='prose max-w-none whitespace-pre-line text-gray-800'>{response.summary}</div>
+                    </div>
+                </div>
+            )}
+
             {response && response.query_type === 'intelligent' && (
                 <div className='max-w-7xl mx-auto space-y-6'>
                     <div className='bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-lg shadow-lg border-l-4 border-blue-600'>
@@ -192,14 +201,18 @@ const Dashboard = () => {
                         {response.heatmap && (
                             <div className='bg-white p-4 rounded-lg shadow'>
                                 <h2 className='text-xl font-bold mb-3'>Geographic Heatmap</h2>
-                                <Plot data={JSON.parse(response.heatmap).data} layout={JSON.parse(response.heatmap).layout} config={{ responsive: true }} />
+                                <div className='w-full overflow-hidden'>
+                                    <Plot data={JSON.parse(response.heatmap).data} layout={JSON.parse(response.heatmap).layout} config={{ responsive: true }} style={{ width: '100%', height: '100%' }} useResizeHandler={true} />
+                                </div>
                             </div>
                         )}
 
                         {response.chart && (
                             <div className='bg-white p-4 rounded-lg shadow'>
                                 <h2 className='text-xl font-bold mb-3'>Depth Profile</h2>
-                                <Plot data={JSON.parse(response.chart).data} layout={JSON.parse(response.chart).layout} config={{ responsive: true }} />
+                                <div className='w-full overflow-hidden'>
+                                    <Plot data={JSON.parse(response.chart).data} layout={JSON.parse(response.chart).layout} config={{ responsive: true }} style={{ width: '100%', height: '100%' }} useResizeHandler={true} />
+                                </div>
                             </div>
                         )}
                     </div>
@@ -207,7 +220,9 @@ const Dashboard = () => {
                     {response.probability_distribution && (
                         <div className='bg-white p-4 rounded-lg shadow'>
                             <h2 className='text-xl font-bold mb-3'>Value Distribution</h2>
-                            <Plot data={JSON.parse(response.probability_distribution).data} layout={JSON.parse(response.probability_distribution).layout} config={{ responsive: true }} style={{ width: '100%' }} />
+                            <div className='w-full overflow-hidden'>
+                                <Plot data={JSON.parse(response.probability_distribution).data} layout={JSON.parse(response.probability_distribution).layout} config={{ responsive: true }} style={{ width: '100%', height: '100%' }} useResizeHandler={true} />
+                            </div>
                         </div>
                     )}
                 </div>

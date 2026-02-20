@@ -7,13 +7,13 @@ from services.ai_engine import summarize, train_model, load_model, analyze_anoma
 from services.conversation import conversation_manager
 from services.tsunami_predictor import generate_tsunami_analysis
 from services.intelligent_responder import generate_intelligent_response, classify_query_intent
+from services.external_ai import is_oceanographic_query, get_fallback_response
 
 router = APIRouter()
 
-# Load ARGO data once at startup
 df = load_data()
 
-# Try to load existing model, if not available, train new one
+
 if not load_model() and not df.empty:
     train_result = train_model(df)
     if train_result:
@@ -24,10 +24,20 @@ def chat(request: ChatRequest):
     session_id = request.session_id
     conversation_manager.add_message(session_id, "user", request.prompt)
     
-    # Check for intelligent response first
+    # Check if user wants visualizations
+    show_visualizations = any(word in request.prompt.lower() for word in ["graph", "chart", "plot", "heatmap", "map", "visualize", "show"])
+    
+    if not is_oceanographic_query(request.prompt):
+        fallback_response = get_fallback_response(request.prompt)
+        conversation_manager.add_message(session_id, "assistant", fallback_response)
+        return {
+            "summary": fallback_response,
+            "query_type": "external",
+            "conversation_history": conversation_manager.get_history(session_id)
+        }
+    
     intent = classify_query_intent(request.prompt)
     
-    # Handle tsunami prediction queries
     if intent == "tsunami":
         tsunami_analysis = generate_tsunami_analysis(df, request.prompt)
         conversation_manager.add_message(session_id, "assistant", tsunami_analysis["summary"])
@@ -41,7 +51,6 @@ def chat(request: ChatRequest):
             "conversation_history": conversation_manager.get_history(session_id)
         }
     
-    # Try intelligent response for specific query types
     intelligent_response = generate_intelligent_response(request.prompt, df)
     if intelligent_response:
         conversation_manager.add_message(session_id, "assistant", intelligent_response)
@@ -51,7 +60,6 @@ def chat(request: ChatRequest):
             "conversation_history": conversation_manager.get_history(session_id)
         }
     
-    # Regular oceanographic queries
     query = parse_prompt(request.prompt)
     filtered_df = filter_data(df, query)
 
@@ -66,6 +74,7 @@ def chat(request: ChatRequest):
             "issues": [],
             "location_insights": "No data available.",
             "query_type": "general",
+            "show_visualizations": False,
             "conversation_history": conversation_manager.get_history(session_id)
         }
 
@@ -85,9 +94,12 @@ def chat(request: ChatRequest):
     }
 
     ai_summary = summarize(request.prompt, stats)
-    chart_json = temperature_depth_plot(filtered_df)
-    heatmap_json = generate_heatmap(filtered_df, variable)
-    prob_dist_json = generate_probability_distribution(filtered_df, variable)
+    
+    # Generate visualizations only if requested
+    chart_json = temperature_depth_plot(filtered_df) if show_visualizations else None
+    heatmap_json = generate_heatmap(filtered_df, variable) if show_visualizations else None
+    prob_dist_json = generate_probability_distribution(filtered_df, variable) if show_visualizations else None
+    
     anomalies = analyze_anomalies(filtered_df, variable)
     location_insights = get_location_insights(filtered_df, query)
     probabilities = calculate_probabilities(filtered_df, variable)
@@ -104,6 +116,7 @@ def chat(request: ChatRequest):
         "issues": anomalies,
         "location_insights": location_insights,
         "query_type": "general",
+        "show_visualizations": show_visualizations,
         "conversation_history": conversation_manager.get_history(session_id)
     }
 

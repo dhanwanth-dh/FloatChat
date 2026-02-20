@@ -11,7 +11,7 @@ const App = () => {
         loop
         muted
         playsInline
-        className="-z-100 absolute top-0 left-0 w-full h-full object-cover"
+        className="-z-100 fixed top-0 left-0 w-full h-full object-cover"
       >
         <source src={vid} type="video/mp4" />
       </video>
