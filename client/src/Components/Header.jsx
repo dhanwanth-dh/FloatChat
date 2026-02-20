@@ -15,7 +15,7 @@ const Header = () => {
     }
     return (
         <header className='flex justify-between items-center py-4 px-2 lg:px-10'>
-            <h1 className='text-white text-3xl md:text-4xl lg:text-5xl font-light m-0'>FlowChat</h1>
+            <h1 className='text-white text-3xl md:text-4xl lg:text-5xl font-light m-0'>FloatChat</h1>
             <nav className='hidden md:flex items-center gap-12'>
                 <a className='text-white text-base tracking-wider transition-colors hover:text-gray-300 z-50' href="#">GLOBE</a>
                 <a className='text-white text-base tracking-wider transition-colors hover:text-gray-300 z-50' href="#">DISASTERS</a>
